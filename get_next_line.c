@@ -1,19 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_result.c                                    :+:      :+:    :+:   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: wleite <wleite@student.42sp.org.br>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 00:15:03 by wleite            #+#    #+#             */
-/*   Updated: 2021/08/12 16:11:00 by wleite           ###   ########.fr       */
+/*   Updated: 2021/08/12 23:52:21 by wleite           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
 
-char *extract_line(char **buffer_backup)
+char	*extract_line(char **buffer_backup)
 {
 	int		i;
 	char	*result;
@@ -29,7 +28,8 @@ char *extract_line(char **buffer_backup)
 		i++;
 	}
 	result = ft_substr(*buffer_backup, 0, i);
-	*buffer_backup = ft_substr(*buffer_backup, i, ft_strlen(result) - ft_strlen(*buffer_backup));
+	*buffer_backup = ft_substr(*buffer_backup, i,
+			ft_strlen(result) - ft_strlen(*buffer_backup));
 	return (result);
 }
 
@@ -39,21 +39,17 @@ char	*get_line(int fd, char **buffer, char **buffer_backup)
 
 	if (ft_strchr(*buffer_backup, '\n'))
 		return (extract_line(buffer_backup));
-
 	count = 1;
 	while (!ft_strchr(*buffer_backup, '\n') && count > 0)
 	{
 		count = read(fd, *buffer, BUFFER_SIZE);
-
 		(*buffer)[BUFFER_SIZE] = '\0';
-		if (count == -1)
+		if (count <= 0)
 			return (NULL);
 		*buffer_backup = ft_strjoin(*buffer_backup, *buffer);
 	}
-
 	if (ft_strchr(*buffer_backup, '\n'))
 		return (extract_line(buffer_backup));
-
 	return (ft_strdup(""));
 }
 
@@ -62,7 +58,6 @@ char	*get_next_line(int fd)
 	static char		*buffer_backup;
 	char			*buffer;
 	char			*result;
-	// int				count;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
@@ -71,58 +66,8 @@ char	*get_next_line(int fd)
 		return (NULL);
 	if (!buffer_backup)
 		buffer_backup = ft_strdup("");
-
-	result = ft_strdup("");
-	// if (ft_strchr(buffer_backup, '\n'))
-	// {
-	// 	result = extract_line(&buffer_backup);
-	// 	return (result);
-	// }
-
-	// count = 1;
-	// while (!ft_strchr(buffer_backup, '\n') && count > 0)
-	// {
-	// 	count = read(fd, buffer, BUFFER_SIZE);
-
-	// 	buffer[BUFFER_SIZE] = '\0';
-	// 	if (count == -1)
-	// 		return (NULL);
-	// 	buffer_backup = ft_strjoin(buffer_backup, buffer);
-	// }
-
-	// if (ft_strchr(buffer_backup, '\n'))
-	// {
-	// 	result = extract_line(&buffer_backup);
-	// 	return (result);
-	// }
-
 	result = get_line(fd, &buffer, &buffer_backup);
-
+	free(buffer);
+	buffer = NULL;
 	return (result);
 }
-
-
-
-
-
-
-
-
-// char	*get_next_line(int fd)
-// {
-// 	static char		*buffer_backup;
-// 	char			*buffer;
-// 	char			*result;
-// 	// int				count;
-
-// 	if (fd < 0 || BUFFER_SIZE <= 0)
-// 		return (NULL);
-// 	buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
-// 	if (!buffer)
-// 		return (NULL);
-// 	buffer[BUFFER_SIZE] = '\0';
-// 	if (!buffer_backup)
-// 		ft_strdup("");
-// 	result = get_line(fd, &buffer, &buffer_backup);
-// 	return (result);
-// }
