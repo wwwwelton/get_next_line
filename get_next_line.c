@@ -1,85 +1,128 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_result.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: wleite <wleite@student.42sp.org.br>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 00:15:03 by wleite            #+#    #+#             */
-/*   Updated: 2021/08/11 00:38:53 by wleite           ###   ########.fr       */
+/*   Updated: 2021/08/12 16:11:00 by wleite           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
 
-char	*get_next_line(int fd)
+char *extract_line(char **buffer_backup)
 {
-	static char		buffer[BUFFER_SIZE];
-	static char		*buffer_backup;
-	char			*result;
-	static size_t	count;
+	int		i;
+	char	*result;
 
-	buffer_backup = ft_calloc(count + 1, sizeof(char));
-	ft_memcpy(buffer_backup, buffer, count);
-	result = ft_strdup(buffer_backup);
-
-	// printf("\nCOUNT: %zu", count);
-	// printf("BUFFER: %s\n", buffer);
-	while(1)
+	i = 0;
+	while ((*buffer_backup)[i] != '\0')
 	{
-		count = read(fd, buffer, BUFFER_SIZE);
-		if (count <= 0)
+		if ((*buffer_backup)[i] == '\n')
 		{
-			result = NULL;
+			i++;
 			break ;
 		}
-		free(buffer_backup);
-		buffer_backup = ft_calloc(count + 1, sizeof(char));
-		ft_memcpy(buffer_backup, buffer, count);
-		result = ft_strljoin(result, buffer_backup, count);
-		if (ft_strchr(result, '\n'))
-		{
-			result = filter_result(result, buffer_backup, count);
-			break ;
-		}
+		i++;
 	}
-	free(buffer_backup);
+	result = ft_substr(*buffer_backup, 0, i);
+	*buffer_backup = ft_substr(*buffer_backup, i, ft_strlen(result) - ft_strlen(*buffer_backup));
 	return (result);
 }
 
+char	*get_line(int fd, char **buffer, char **buffer_backup)
+{
+	int	count;
+
+	if (ft_strchr(*buffer_backup, '\n'))
+		return (extract_line(buffer_backup));
+
+	count = 1;
+	while (!ft_strchr(*buffer_backup, '\n') && count > 0)
+	{
+		count = read(fd, *buffer, BUFFER_SIZE);
+
+		(*buffer)[BUFFER_SIZE] = '\0';
+		if (count == -1)
+			return (NULL);
+		*buffer_backup = ft_strjoin(*buffer_backup, *buffer);
+	}
+
+	if (ft_strchr(*buffer_backup, '\n'))
+		return (extract_line(buffer_backup));
+
+	return (ft_strdup(""));
+}
+
+char	*get_next_line(int fd)
+{
+	static char		*buffer_backup;
+	char			*buffer;
+	char			*result;
+	// int				count;
+
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
+	if (!buffer)
+		return (NULL);
+	if (!buffer_backup)
+		buffer_backup = ft_strdup("");
+
+	result = ft_strdup("");
+	// if (ft_strchr(buffer_backup, '\n'))
+	// {
+	// 	result = extract_line(&buffer_backup);
+	// 	return (result);
+	// }
+
+	// count = 1;
+	// while (!ft_strchr(buffer_backup, '\n') && count > 0)
+	// {
+	// 	count = read(fd, buffer, BUFFER_SIZE);
+
+	// 	buffer[BUFFER_SIZE] = '\0';
+	// 	if (count == -1)
+	// 		return (NULL);
+	// 	buffer_backup = ft_strjoin(buffer_backup, buffer);
+	// }
+
+	// if (ft_strchr(buffer_backup, '\n'))
+	// {
+	// 	result = extract_line(&buffer_backup);
+	// 	return (result);
+	// }
+
+	result = get_line(fd, &buffer, &buffer_backup);
+
+	return (result);
+}
+
+
+
+
+
+
+
+
 // char	*get_next_line(int fd)
 // {
-// 	static char	buffer[BUFFER_SIZE];
-// 	char		*buffer_backup;
-// 	char		*result;
-// 	size_t		count;
+// 	static char		*buffer_backup;
+// 	char			*buffer;
+// 	char			*result;
+// 	// int				count;
 
-// 	buffer_backup = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
-// 	ft_memcpy(buffer_backup, buffer, BUFFER_SIZE);
-// 	result = ft_strdup(buffer_backup);
-
-// 	ft_bzero(buffer, BUFFER_SIZE);
-
-// 	// printf("\nRESULT: %s", result);
-// 	// printf("BUFFER: %s\n", buffer);
-// 	while(1)
-// 	{
-// 		count = read(fd, buffer, BUFFER_SIZE);
-// 		if (count <= 0)
-// 		{
-// 			result = NULL;
-// 			break ;
-// 		}
-// 		ft_memcpy(buffer_backup, buffer, BUFFER_SIZE);
-// 		buffer_backup[BUFFER_SIZE] = '\0';
-// 		result = ft_strjoin(result, buffer_backup);
-// 		if (ft_strchr(result, '\n'))
-// 		{
-// 			result = filter_result(result, buffer);
-// 			break ;
-// 		}
-// 	}
-// 	free (buffer_backup);
+// 	if (fd < 0 || BUFFER_SIZE <= 0)
+// 		return (NULL);
+// 	buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
+// 	if (!buffer)
+// 		return (NULL);
+// 	buffer[BUFFER_SIZE] = '\0';
+// 	if (!buffer_backup)
+// 		ft_strdup("");
+// 	result = get_line(fd, &buffer, &buffer_backup);
 // 	return (result);
 // }
