@@ -6,7 +6,7 @@
 /*   By: wleite <wleite@student.42sp.org.br>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 00:15:03 by wleite            #+#    #+#             */
-/*   Updated: 2021/08/12 23:52:21 by wleite           ###   ########.fr       */
+/*   Updated: 2021/08/13 15:43:34 by wleite           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ char	*extract_line(char **buffer_backup)
 {
 	int		i;
 	char	*result;
+	char	*temp_free;
 
 	i = 0;
 	while ((*buffer_backup)[i] != '\0')
@@ -27,15 +28,18 @@ char	*extract_line(char **buffer_backup)
 		}
 		i++;
 	}
-	result = ft_substr(*buffer_backup, 0, i);
+	temp_free = *buffer_backup;
+	result = ft_substr(temp_free, 0, i);
 	*buffer_backup = ft_substr(*buffer_backup, i,
 			ft_strlen(result) - ft_strlen(*buffer_backup));
+	free(temp_free);
 	return (result);
 }
 
 char	*get_line(int fd, char **buffer, char **buffer_backup)
 {
-	int	count;
+	int		count;
+	char	*temp_free;
 
 	if (ft_strchr(*buffer_backup, '\n'))
 		return (extract_line(buffer_backup));
@@ -43,14 +47,20 @@ char	*get_line(int fd, char **buffer, char **buffer_backup)
 	while (!ft_strchr(*buffer_backup, '\n') && count > 0)
 	{
 		count = read(fd, *buffer, BUFFER_SIZE);
-		(*buffer)[BUFFER_SIZE] = '\0';
 		if (count <= 0)
+		{
+			free(*buffer_backup);
+			*buffer_backup = NULL;
 			return (NULL);
-		*buffer_backup = ft_strjoin(*buffer_backup, *buffer);
+		}
+		(*buffer)[count] = '\0';
+		temp_free = *buffer_backup;
+		*buffer_backup = ft_strjoin(temp_free, *buffer);
+		free(temp_free);
 	}
 	if (ft_strchr(*buffer_backup, '\n'))
 		return (extract_line(buffer_backup));
-	return (ft_strdup(""));
+	return (*buffer_backup);
 }
 
 char	*get_next_line(int fd)
