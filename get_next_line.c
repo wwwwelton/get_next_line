@@ -6,7 +6,7 @@
 /*   By: wleite <wleite@student.42sp.org.br>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 00:15:03 by wleite            #+#    #+#             */
-/*   Updated: 2021/08/14 00:06:20 by wleite           ###   ########.fr       */
+/*   Updated: 2021/08/14 02:28:27 by wleite           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,44 +30,18 @@ char	*extract_line(char **buffer_backup)
 	}
 	temp_free = *buffer_backup;
 	result = ft_substr(temp_free, 0, i);
-	*buffer_backup = ft_substr(*buffer_backup, i,
-			ft_strlen(result) - ft_strlen(*buffer_backup));
+	*buffer_backup = ft_strdup(&(*buffer_backup)[i]);
+
 	free(temp_free);
+	temp_free = NULL;
+
 	return (result);
 }
-
-// char	*get_line(int fd, char **buffer, char **buffer_backup)
-// {
-// 	int		count;
-// 	char	*temp_free;
-
-// 	if (ft_strchr(*buffer_backup, '\n'))
-// 		return (extract_line(buffer_backup));
-
-// 	count = BUFFER_SIZE;
-// 	while (!ft_strchr(*buffer, '\n') && count == BUFFER_SIZE)
-// 	{
-// 		count = read(fd, *buffer, BUFFER_SIZE);
-// 		(*buffer)[count] = '\0';
-// 		temp_free = *buffer_backup;
-// 		*buffer_backup = ft_strjoin(temp_free, *buffer);
-// 		free(temp_free);
-// 	}
-
-// 	if (ft_strchr(*buffer_backup, '\n'))
-// 		return (extract_line(buffer_backup));
-
-// 	if (!ft_strchr(*buffer_backup, '\n') && (*buffer_backup)[0])
-// 		return (ft_strdup(*buffer_backup));
-
-// 	return (NULL);
-// }
 
 char	*get_line(int fd, char **buffer, char **buffer_backup)
 {
 	int		count;
 	char	*temp_free;
-	char	*temp_free2;
 
 	if (ft_strchr(*buffer_backup, '\n'))
 		return (extract_line(buffer_backup));
@@ -76,16 +50,18 @@ char	*get_line(int fd, char **buffer, char **buffer_backup)
 	while (!ft_strchr(*buffer_backup, '\n') && count > 0)
 	{
 		count = read(fd, *buffer, BUFFER_SIZE);
-		if (count < 0)
-		{
-			free(*buffer_backup);
-			*buffer_backup = NULL;
-			return (NULL);
-		}
 		(*buffer)[count] = '\0';
 		temp_free = *buffer_backup;
 		*buffer_backup = ft_strjoin(temp_free, *buffer);
 		free(temp_free);
+		temp_free = NULL;
+	}
+
+	if (count == 0 && !(*buffer_backup)[0])
+	{
+		free(*buffer_backup);
+		*buffer_backup = NULL;
+		return (NULL);
 	}
 
 	if (ft_strchr(*buffer_backup, '\n'))
@@ -93,10 +69,12 @@ char	*get_line(int fd, char **buffer, char **buffer_backup)
 
 	if (!ft_strchr(*buffer_backup, '\n') && (*buffer_backup)[0])
 	{
-		temp_free2 = ft_strdup(*buffer_backup);
+		temp_free = ft_strdup(*buffer_backup);
+
 		free(*buffer_backup);
 		*buffer_backup = NULL;
-		return (temp_free2);
+
+		return (temp_free);
 	}
 
 	return (NULL);
