@@ -6,7 +6,7 @@
 /*   By: wleite <wleite@student.42sp.org.br>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 00:12:59 by wleite            #+#    #+#             */
-/*   Updated: 2021/08/12 23:03:07 by wleite           ###   ########.fr       */
+/*   Updated: 2021/08/13 21:56:55 by wleite           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include <stdlib.h>
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 100
+# define BUFFER_SIZE 10
 #endif
 
 char	*get_next_line(int fd);
