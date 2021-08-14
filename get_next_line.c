@@ -6,7 +6,7 @@
 /*   By: wleite <wleite@student.42sp.org.br>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 00:15:03 by wleite            #+#    #+#             */
-/*   Updated: 2021/08/14 02:28:27 by wleite           ###   ########.fr       */
+/*   Updated: 2021/08/14 02:37:09 by wleite           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,12 @@ char	*get_line(int fd, char **buffer, char **buffer_backup)
 	while (!ft_strchr(*buffer_backup, '\n') && count > 0)
 	{
 		count = read(fd, *buffer, BUFFER_SIZE);
+		if (count < 0)
+		{
+			free(*buffer_backup);
+			*buffer_backup = NULL;
+			return (NULL);
+		}
 		(*buffer)[count] = '\0';
 		temp_free = *buffer_backup;
 		*buffer_backup = ft_strjoin(temp_free, *buffer);
