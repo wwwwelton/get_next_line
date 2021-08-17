@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: wleite <wleite@student.42sp.org.br>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 00:15:03 by wleite            #+#    #+#             */
-/*   Updated: 2021/08/17 01:15:04 by wleite           ###   ########.fr       */
+/*   Updated: 2021/08/17 16:37:47 by wleite           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 static void	free_ptr(char **ptr)
 {
@@ -61,18 +61,18 @@ static char	*get_line(int fd, char **buffer, char **buffer_backup)
 	if (ft_strchr(*buffer_backup, '\n'))
 		return (extract_line(buffer_backup));
 	bytes_read = read_file(fd, buffer, buffer_backup);
+	if ((bytes_read == 0 || bytes_read == -1) && !**buffer_backup)
+	{
+		free_ptr(buffer_backup);
+		return (NULL);
+	}
 	if (ft_strchr(*buffer_backup, '\n'))
 		return (extract_line(buffer_backup));
-	if (!ft_strchr(*buffer_backup, '\n') && (*buffer_backup)[0])
+	if (!ft_strchr(*buffer_backup, '\n') && **buffer_backup)
 	{
 		temp_free = ft_strdup(*buffer_backup);
 		free_ptr(buffer_backup);
 		return (temp_free);
-	}
-	if (!bytes_read && !(*buffer_backup)[0])
-	{
-		free_ptr(buffer_backup);
-		return (NULL);
 	}
 	return (NULL);
 }
