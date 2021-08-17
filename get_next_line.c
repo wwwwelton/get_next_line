@@ -6,7 +6,7 @@
 /*   By: wleite <wleite@student.42sp.org.br>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 00:15:03 by wleite            #+#    #+#             */
-/*   Updated: 2021/08/17 16:21:23 by wleite           ###   ########.fr       */
+/*   Updated: 2021/08/17 16:57:46 by wleite           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ static char	*get_line(int fd, char **buffer, char **buffer_backup)
 
 char	*get_next_line(int fd)
 {
-	static char		*buffer_backup[OPEN_MAX];
+	static char		*buffer_backup[OPEN_MAX + 1];
 	char			*buffer;
 	char			*result;
 
