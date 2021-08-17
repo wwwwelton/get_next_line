@@ -6,13 +6,13 @@
 /*   By: wleite <wleite@student.42sp.org.br>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 00:15:03 by wleite            #+#    #+#             */
-/*   Updated: 2021/08/17 00:33:08 by wleite           ###   ########.fr       */
+/*   Updated: 2021/08/17 01:15:04 by wleite           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static void free_ptr(char **ptr)
+static void	free_ptr(char **ptr)
 {
 	free(*ptr);
 	*ptr = NULL;
@@ -25,18 +25,11 @@ static char	*extract_line(char **buffer_backup)
 	char	*temp_free;
 
 	i = 0;
-	while ((*buffer_backup)[i] != '\0')
-	{
-		if ((*buffer_backup)[i] == '\n')
-		{
-			i++;
-			break ;
-		}
+	while ((*buffer_backup)[i] != '\0' && (*buffer_backup)[i] != '\n')
 		i++;
-	}
 	temp_free = *buffer_backup;
-	line = ft_substr(temp_free, 0, i);
-	*buffer_backup = ft_strdup(&(*buffer_backup)[i]);
+	line = ft_substr(temp_free, 0, i + 1);
+	*buffer_backup = ft_strdup(&(*buffer_backup)[i + 1]);
 	free_ptr(&temp_free);
 	return (line);
 }
@@ -68,11 +61,6 @@ static char	*get_line(int fd, char **buffer, char **buffer_backup)
 	if (ft_strchr(*buffer_backup, '\n'))
 		return (extract_line(buffer_backup));
 	bytes_read = read_file(fd, buffer, buffer_backup);
-	if (!bytes_read && !(*buffer_backup)[0])
-	{
-		free_ptr(buffer_backup);
-		return (NULL);
-	}
 	if (ft_strchr(*buffer_backup, '\n'))
 		return (extract_line(buffer_backup));
 	if (!ft_strchr(*buffer_backup, '\n') && (*buffer_backup)[0])
@@ -80,6 +68,11 @@ static char	*get_line(int fd, char **buffer, char **buffer_backup)
 		temp_free = ft_strdup(*buffer_backup);
 		free_ptr(buffer_backup);
 		return (temp_free);
+	}
+	if (!bytes_read && !(*buffer_backup)[0])
+	{
+		free_ptr(buffer_backup);
+		return (NULL);
 	}
 	return (NULL);
 }
