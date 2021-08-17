@@ -6,11 +6,17 @@
 /*   By: wleite <wleite@student.42sp.org.br>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 00:15:03 by wleite            #+#    #+#             */
-/*   Updated: 2021/08/16 23:51:09 by wleite           ###   ########.fr       */
+/*   Updated: 2021/08/17 00:33:08 by wleite           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+static void free_ptr(char **ptr)
+{
+	free(*ptr);
+	*ptr = NULL;
+}
 
 static char	*extract_line(char **buffer_backup)
 {
@@ -31,8 +37,7 @@ static char	*extract_line(char **buffer_backup)
 	temp_free = *buffer_backup;
 	line = ft_substr(temp_free, 0, i);
 	*buffer_backup = ft_strdup(&(*buffer_backup)[i]);
-	free(temp_free);
-	temp_free = NULL;
+	free_ptr(&temp_free);
 	return (line);
 }
 
@@ -46,16 +51,11 @@ static int	read_file(int fd, char **buffer, char **buffer_backup)
 	{
 		bytes_read = read(fd, *buffer, BUFFER_SIZE);
 		if (bytes_read == -1)
-		{
-			free(*buffer_backup);
-			*buffer_backup = NULL;
 			return (bytes_read);
-		}
 		(*buffer)[bytes_read] = '\0';
 		temp_free = *buffer_backup;
 		*buffer_backup = ft_strjoin(temp_free, *buffer);
-		free(temp_free);
-		temp_free = NULL;
+		free_ptr(&temp_free);
 	}
 	return (bytes_read);
 }
@@ -68,12 +68,9 @@ static char	*get_line(int fd, char **buffer, char **buffer_backup)
 	if (ft_strchr(*buffer_backup, '\n'))
 		return (extract_line(buffer_backup));
 	bytes_read = read_file(fd, buffer, buffer_backup);
-	if (bytes_read == -1)
-		return (NULL);
 	if (!bytes_read && !(*buffer_backup)[0])
 	{
-		free(*buffer_backup);
-		*buffer_backup = NULL;
+		free_ptr(buffer_backup);
 		return (NULL);
 	}
 	if (ft_strchr(*buffer_backup, '\n'))
@@ -81,8 +78,7 @@ static char	*get_line(int fd, char **buffer, char **buffer_backup)
 	if (!ft_strchr(*buffer_backup, '\n') && (*buffer_backup)[0])
 	{
 		temp_free = ft_strdup(*buffer_backup);
-		free(*buffer_backup);
-		*buffer_backup = NULL;
+		free_ptr(buffer_backup);
 		return (temp_free);
 	}
 	return (NULL);
@@ -102,7 +98,6 @@ char	*get_next_line(int fd)
 	if (!buffer_backup[fd])
 		buffer_backup[fd] = ft_strdup("");
 	result = get_line(fd, &buffer, &buffer_backup[fd]);
-	free(buffer);
-	buffer = NULL;
+	free_ptr(&buffer);
 	return (result);
 }
