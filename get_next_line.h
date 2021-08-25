@@ -6,7 +6,7 @@
 /*   By: wleite <wleite@student.42sp.org.br>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 00:12:59 by wleite            #+#    #+#             */
-/*   Updated: 2021/08/17 20:21:08 by wleite           ###   ########.fr       */
+/*   Updated: 2021/08/25 16:08:00 by wleite           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <unistd.h>
 # include <stdlib.h>
+# include <limits.h>
 
 # ifndef OPEN_MAX
 #  define OPEN_MAX 256
